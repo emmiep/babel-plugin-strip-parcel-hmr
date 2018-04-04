@@ -3,5 +3,12 @@
   "version": "0.0.0",
   "main": "src/index.js",
   "author": "Emmie Päivärinta <Emmie.Paivarinta@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "scripts": {
+    "lint": "eslint src/**"
+  },
+  "devDependencies": {
+    "@emmiep/eslint-config": "^2.0.0",
+    "eslint": "^4.19.1"
+  }
 }
