@@ -1,0 +1,38 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`plugin keeps if-statement testing other objects with a hot property 1`] = `
+"
+if (notModule.hot) {
+  shouldBeKept;
+}"
+`;
+
+exports[`plugin keeps if-statements testing local module variables 1`] = `
+"
+const module = { hot: true };
+
+if (module.hot) {
+  shouldBeKept;
+}"
+`;
+
+exports[`plugin keeps if-statements testing other properties of the module object 1`] = `
+"
+if (module.notHot) {
+  shouldBeKept;
+}"
+`;
+
+exports[`plugin keeps negated if-statements testing for HMR 1`] = `
+"
+if (!module.hot) {
+  shouldBeKept;
+}"
+`;
+
+exports[`plugin removes standalone if-statements testing for HMR 1`] = `
+"
+before;
+
+after;"
+`;
