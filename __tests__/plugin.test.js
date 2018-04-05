@@ -9,77 +9,67 @@ const defaultBabelOptions = {
 const fixturesDir = path.join(__dirname, '__fixtures__');
 
 describe('plugin', () => {
-  let babelOptions;
-
-  beforeEach(() => babelOptions = Object.assign({}, defaultBabelOptions, {
-    plugins: [plugin]
-  }));
-
   it('removes standalone HMR test if-clauses', () => {
-    const fixture = fixturePath('remove-standalone-if');
-    const output = transformFileSync(fixture, babelOptions);
+    const output = transformFixture('remove-standalone-if');
     expect(output.code).toMatchSnapshot();
   });
 
   it('extracts else-statements following HMR test if-clauses', () => {
-    const fixture = fixturePath('extract-following-else');
-    const output = transformFileSync(fixture, babelOptions);
+    const output = transformFixture('extract-following-else');
     expect(output.code).toMatchSnapshot();
   });
 
   it('extracts else-if-statements following HMR test if-clauses', () => {
-    const fixture = fixturePath('extract-following-else-if');
-    const output = transformFileSync(fixture, babelOptions);
+    const output = transformFixture('extract-following-else-if');
     expect(output.code).toMatchSnapshot();
   });
 
   it('combines if-clauses surrounding HMR test if-statements', () => {
-    const fixture = fixturePath('combine-surrounding-if');
-    const output = transformFileSync(fixture, babelOptions);
+    const output = transformFixture('combine-surrounding-if');
     expect(output.code).toMatchSnapshot();
   });
 
   it('ignores other properties of the HMR object', () => {
-    const fixture = fixturePath('ignore-other-object-properties');
-    const output = transformFileSync(fixture, babelOptions);
+    const output = transformFixture('ignore-other-object-properties');
     expect(output.code).toMatchSnapshot();
   });
 
   it('ignores other objects', () => {
-    const fixture = fixturePath('ignore-other-objects');
-    const output = transformFileSync(fixture, babelOptions);
+    const output = transformFixture('ignore-other-objects');
     expect(output.code).toMatchSnapshot();
   });
 
   it('ignores negated HMR tests', () => {
-    const fixture = fixturePath('ignore-negated-tests');
-    const output = transformFileSync(fixture, babelOptions);
+    const output = transformFixture('ignore-negated-tests');
     expect(output.code).toMatchSnapshot();
   });
 
   it('ignores local variable bindings', () => {
-    const fixture = fixturePath('ignore-local-variables');
-    const output = transformFileSync(fixture, babelOptions);
+    const output = transformFixture('ignore-local-variables');
     expect(output.code).toMatchSnapshot();
   });
 
   it('allows customizing object and property names', () => {
-    babelOptions = {
-      plugins: [
-        [plugin, {
-          objectName: 'customObjectName',
-          propertyName: 'customPropertyName'
-        }]
-      ]
-    };
-
-    const fixture = fixturePath('use-custom-names');
-    const output = transformFileSync(fixture, babelOptions);
+    const output = transformFixture('use-custom-names', {
+      objectName: 'customObjectName',
+      propertyName: 'customPropertyName'
+    });
     expect(output.code).toMatchSnapshot();
   });
 });
 
-function fixturePath(name) {
+function transformFixture(fixtureName, pluginOptions = {}) {
+  const fixturePath = getFixturePath(fixtureName);
+  const options = Object.assign({}, defaultBabelOptions, {
+    plugins: [
+      [plugin, pluginOptions]
+    ]
+  });
+
+  return transformFileSync(fixturePath, options);
+}
+
+function getFixturePath(name) {
   return path.join(fixturesDir, `${name}.js`);
 }
 
