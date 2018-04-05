@@ -5,7 +5,7 @@ const defaultOptions = {
   propertyName: 'hot'
 };
 
-module.exports = function plugin({types: t}) {
+module.exports = function plugin() {
   return {
     visitor: {
       MemberExpression(path) {
