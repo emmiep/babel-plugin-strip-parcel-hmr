@@ -1,9 +1,12 @@
 const plugin = require('../src/plugin');
-const {transform} = require('babel-core');
+const {transformFileSync} = require('babel-core');
+const path = require('path');
 
 const defaultBabelOptions = {
   babelrc: false
 };
+
+const fixturesDir = path.join(__dirname, '__fixtures__');
 
 describe('plugin', () => {
   let babelOptions;
@@ -12,105 +15,51 @@ describe('plugin', () => {
     plugins: [plugin]
   }));
 
-  it('removes standalone if-statements testing for HMR', () => {
-    const input = `
-      before;
-      if (module.hot) {
-        shouldBeRemoved;
-      }
-      after;
-    `;
-
-    const output = transform(input, babelOptions);
+  it('removes standalone HMR test if-clauses', () => {
+    const fixture = fixturePath('remove-standalone-if');
+    const output = transformFileSync(fixture, babelOptions);
     expect(output.code).toMatchSnapshot();
   });
 
-  it('keeps else-statements following if-statements testing for HMR', () => {
-    const input = `
-      if (module.hot) {
-        shouldBeRemoved;
-      } else {
-        shouldBeKept;
-      }
-    `;
-
-    const output = transform(input, babelOptions);
+  it('extracts else-statements following HMR test if-clauses', () => {
+    const fixture = fixturePath('extract-following-else');
+    const output = transformFileSync(fixture, babelOptions);
     expect(output.code).toMatchSnapshot();
   });
 
-  it('keeps if-else-statements following if-statements testing for HMR', () => {
-    const input = `
-      if (module.hot) {
-        shouldBeRemoved;
-      } else if (module.notHot) {
-        shouldBeKept;
-      } else {
-        shouldAlsoBeKept;
-      }
-    `;
-
-    const output = transform(input, babelOptions);
+  it('extracts else-if-statements following HMR test if-clauses', () => {
+    const fixture = fixturePath('extract-following-else-if');
+    const output = transformFileSync(fixture, babelOptions);
     expect(output.code).toMatchSnapshot();
   });
 
-  it('combines if-clauses surrounding if-statement testing for HMR', () => {
-    const input = `
-      if (module.notHot) {
-        shouldBeKept;
-      } else if (module.hot) {
-        shouldBeRemoved;
-      } else {
-        shouldAlsoBeKept;
-      }
-    `;
-
-    const output = transform(input, babelOptions);
+  it('combines if-clauses surrounding HMR test if-statements', () => {
+    const fixture = fixturePath('combine-surrounding-if');
+    const output = transformFileSync(fixture, babelOptions);
     expect(output.code).toMatchSnapshot();
   });
 
-  it('keeps if-statements testing other properties of the module object', () => {
-    const input = `
-      if (module.notHot) {
-        shouldBeKept;
-      }
-    `;
-
-    const output = transform(input, babelOptions);
+  it('ignores other properties of the HMR object', () => {
+    const fixture = fixturePath('ignore-other-object-properties');
+    const output = transformFileSync(fixture, babelOptions);
     expect(output.code).toMatchSnapshot();
   });
 
-  it('keeps if-statement testing other objects with a hot property', () => {
-    const input = `
-      if (notModule.hot) {
-        shouldBeKept;
-      }
-    `;
-
-    const output = transform(input, babelOptions);
+  it('ignores other objects', () => {
+    const fixture = fixturePath('ignore-other-objects');
+    const output = transformFileSync(fixture, babelOptions);
     expect(output.code).toMatchSnapshot();
   });
 
-  it('keeps negated if-statements testing for HMR', () => {
-    const input = `
-      if (!module.hot) {
-        shouldBeKept;
-      }
-    `;
-
-    const output = transform(input, babelOptions);
+  it('ignores negated HMR tests', () => {
+    const fixture = fixturePath('ignore-negated-tests');
+    const output = transformFileSync(fixture, babelOptions);
     expect(output.code).toMatchSnapshot();
   });
 
-  it('keeps if-statements testing local module variables', () => {
-    const input = `
-      const module = {hot: true};
-
-      if (module.hot) {
-        shouldBeKept;
-      }
-    `;
-
-    const output = transform(input, babelOptions);
+  it('ignores local variable bindings', () => {
+    const fixture = fixturePath('ignore-local-variables');
+    const output = transformFileSync(fixture, babelOptions);
     expect(output.code).toMatchSnapshot();
   });
 
@@ -124,18 +73,13 @@ describe('plugin', () => {
       ]
     };
 
-    const input = `
-      if (module.hot) {
-        shouldBeKept;
-      }
-
-      if (customObjectName.customPropertyName) {
-        shouldBeRemoved;
-      }
-    `;
-
-    const output = transform(input, babelOptions);
+    const fixture = fixturePath('use-custom-names');
+    const output = transformFileSync(fixture, babelOptions);
     expect(output.code).toMatchSnapshot();
   });
 });
+
+function fixturePath(name) {
+  return path.join(fixturesDir, `${name}.js`);
+}
 

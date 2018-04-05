@@ -1,28 +1,20 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`plugin allows customizing object and property names 1`] = `
-"
-if (module.hot) {
+"if (module.hot) {
   shouldBeKept;
 }"
 `;
 
-exports[`plugin combines if-clauses surrounding if-statement testing for HMR 1`] = `
-"
-if (module.notHot) {
+exports[`plugin combines if-clauses surrounding HMR test if-statements 1`] = `
+"if (module.notHot) {
   shouldBeKept;
 } else {
     shouldAlsoBeKept;
   }"
 `;
 
-exports[`plugin keeps else-statements following if-statements testing for HMR 1`] = `
-"{
-  shouldBeKept;
-}"
-`;
-
-exports[`plugin keeps if-else-statements following if-statements testing for HMR 1`] = `
+exports[`plugin extracts else-if-statements following HMR test if-clauses 1`] = `
 "if (module.notHot) {
   shouldBeKept;
 } else {
@@ -30,39 +22,40 @@ exports[`plugin keeps if-else-statements following if-statements testing for HMR
 }"
 `;
 
-exports[`plugin keeps if-statement testing other objects with a hot property 1`] = `
-"
-if (notModule.hot) {
+exports[`plugin extracts else-statements following HMR test if-clauses 1`] = `
+"{
   shouldBeKept;
 }"
 `;
 
-exports[`plugin keeps if-statements testing local module variables 1`] = `
-"
-const module = { hot: true };
+exports[`plugin ignores local variable bindings 1`] = `
+"const module = { hot: true };
 
 if (module.hot) {
   shouldBeKept;
 }"
 `;
 
-exports[`plugin keeps if-statements testing other properties of the module object 1`] = `
-"
-if (module.notHot) {
+exports[`plugin ignores negated HMR tests 1`] = `
+"if (!module.hot) {
   shouldBeKept;
 }"
 `;
 
-exports[`plugin keeps negated if-statements testing for HMR 1`] = `
-"
-if (!module.hot) {
+exports[`plugin ignores other objects 1`] = `
+"if (notModule.hot) {
   shouldBeKept;
 }"
 `;
 
-exports[`plugin removes standalone if-statements testing for HMR 1`] = `
-"
-before;
+exports[`plugin ignores other properties of the HMR object 1`] = `
+"if (module.notHot) {
+  shouldBeKept;
+}"
+`;
+
+exports[`plugin removes standalone HMR test if-clauses 1`] = `
+"before;
 
 after;"
 `;
