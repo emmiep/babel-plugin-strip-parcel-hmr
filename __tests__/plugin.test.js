@@ -1,4 +1,4 @@
-const plugin = require('../src/index');
+const plugin = require('../src/plugin');
 const {transform} = require('babel-core');
 
 const defaultBabelOptions = {
