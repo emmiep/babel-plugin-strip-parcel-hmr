@@ -15,7 +15,7 @@ module.exports = function plugin({types: t}) {
         if (!isGlobalVariable(path.get('object'))) return;
         if (!isIfTestExpression(path)) return;
 
-        path.parentPath.remove();
+        removeIfStatement(path.parentPath);
       }
     }
   };
@@ -36,6 +36,16 @@ module.exports = function plugin({types: t}) {
   function isIfTestExpression(expressionPath) {
     return expressionPath.parentPath.isIfStatement()
       && expressionPath.parentPath.node.test === expressionPath.node;
+  }
+
+  function removeIfStatement(ifStatementPath) {
+    const elseStatement = ifStatementPath.node.alternate;
+
+    if (elseStatement) {
+      ifStatementPath.replaceWith(elseStatement);
+    } else {
+      ifStatementPath.remove();
+    }
   }
 };
 

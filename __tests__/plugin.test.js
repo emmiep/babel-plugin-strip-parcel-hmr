@@ -25,6 +25,49 @@ describe('plugin', () => {
     expect(output.code).toMatchSnapshot();
   });
 
+  it('keeps else-statements following if-statements testing for HMR', () => {
+    const input = `
+      if (module.hot) {
+        shouldBeRemoved;
+      } else {
+        shouldBeKept;
+      }
+    `;
+
+    const output = transform(input, babelOptions);
+    expect(output.code).toMatchSnapshot();
+  });
+
+  it('keeps if-else-statements following if-statements testing for HMR', () => {
+    const input = `
+      if (module.hot) {
+        shouldBeRemoved;
+      } else if (module.notHot) {
+        shouldBeKept;
+      } else {
+        shouldAlsoBeKept;
+      }
+    `;
+
+    const output = transform(input, babelOptions);
+    expect(output.code).toMatchSnapshot();
+  });
+
+  it('combines if-clauses surrounding if-statement testing for HMR', () => {
+    const input = `
+      if (module.notHot) {
+        shouldBeKept;
+      } else if (module.hot) {
+        shouldBeRemoved;
+      } else {
+        shouldAlsoBeKept;
+      }
+    `;
+
+    const output = transform(input, babelOptions);
+    expect(output.code).toMatchSnapshot();
+  });
+
   it('keeps if-statements testing other properties of the module object', () => {
     const input = `
       if (module.notHot) {
