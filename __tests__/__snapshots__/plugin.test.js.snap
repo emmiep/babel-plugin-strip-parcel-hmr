@@ -1,5 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`plugin allows customizing object and property names 1`] = `
+"
+if (module.hot) {
+  shouldBeKept;
+}"
+`;
+
 exports[`plugin combines if-clauses surrounding if-statement testing for HMR 1`] = `
 "
 if (module.notHot) {

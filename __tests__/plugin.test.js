@@ -113,5 +113,29 @@ describe('plugin', () => {
     const output = transform(input, babelOptions);
     expect(output.code).toMatchSnapshot();
   });
+
+  it('allows customizing object and property names', () => {
+    babelOptions = {
+      plugins: [
+        [plugin, {
+          objectName: 'customObjectName',
+          propertyName: 'customPropertyName'
+        }]
+      ]
+    };
+
+    const input = `
+      if (module.hot) {
+        shouldBeKept;
+      }
+
+      if (customObjectName.customPropertyName) {
+        shouldBeRemoved;
+      }
+    `;
+
+    const output = transform(input, babelOptions);
+    expect(output.code).toMatchSnapshot();
+  });
 });
 

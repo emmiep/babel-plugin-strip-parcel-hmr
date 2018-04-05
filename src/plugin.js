@@ -8,8 +8,8 @@ const defaultOptions = {
 module.exports = function plugin() {
   return {
     visitor: {
-      MemberExpression(path) {
-        const {objectName, propertyName} = defaultOptions;
+      MemberExpression(path, {opts}) {
+        const {objectName, propertyName} = Object.assign({}, defaultOptions, opts);
 
         if (!isMember(path, {objectName, propertyName})) return;
         if (!isGlobalVariable(path.get('object'))) return;
