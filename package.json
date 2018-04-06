@@ -1,6 +1,6 @@
 {
   "name": "@emmiep/babel-plugin-strip-parcel-hmr",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "main": "src/plugin.js",
   "author": "Emmie Päivärinta <Emmie.Paivarinta@gmail.com>",
   "license": "MIT",
