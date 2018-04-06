@@ -1,0 +1,4 @@
+if (!module.hot) {
+  shouldBeKept;
+}
+

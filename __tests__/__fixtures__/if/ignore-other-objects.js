@@ -1,0 +1,4 @@
+if (notModule.hot) {
+  shouldBeKept;
+}
+

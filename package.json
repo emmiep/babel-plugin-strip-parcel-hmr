@@ -1,7 +1,26 @@
 {
   "name": "@emmiep/babel-plugin-strip-parcel-hmr",
-  "version": "0.0.0",
-  "main": "index.js",
+  "version": "1.0.0",
+  "main": "src/plugin.js",
   "author": "Emmie Päivärinta <Emmie.Paivarinta@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "repository": "github:emmiep/babel-plugin-strip-parcel-hmr",
+  "keywords": [
+    "babel-plugin",
+    "parcel",
+    "hmr"
+  ],
+  "scripts": {
+    "prepublish": "run-p -nl test lint",
+    "test": "jest",
+    "lint": "eslint src/** __tests__/**",
+    "watch:test": "$npm_execpath test --watch"
+  },
+  "devDependencies": {
+    "@emmiep/eslint-config": "^2.0.0",
+    "babel-core": "^6.26.0",
+    "eslint": "^4.19.1",
+    "jest": "^22.4.3",
+    "npm-run-all": "^4.1.2"
+  }
 }

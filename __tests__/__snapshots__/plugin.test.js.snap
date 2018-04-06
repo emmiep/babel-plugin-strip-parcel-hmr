@@ -1,0 +1,75 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`plugin when transforming conditional expressions ignores local variable bindings 1`] = `
+"const module = { hot: true };
+
+const value = module.hot ? shouldBeKept : shouldAlsoBeKept;"
+`;
+
+exports[`plugin when transforming conditional expressions ignores negated tests 1`] = `"const value = !module.hot ? shouldBeKept : shouldAlsoBeKept;"`;
+
+exports[`plugin when transforming conditional expressions ignores other object properties 1`] = `"const value = module.notHot ? shouldBeKept : shouldAlsoBeKept;"`;
+
+exports[`plugin when transforming conditional expressions ignores other objects 1`] = `"const value = notModule.hot ? shouldBeKept : shouldAlsoBeKept;"`;
+
+exports[`plugin when transforming conditional expressions substitutes expressions with matching tests 1`] = `"const value = shouldBeKept;"`;
+
+exports[`plugin when transforming if statements combines if-clauses surrounding matching if-clauses 1`] = `
+"if (module.notHot) {
+  shouldBeKept;
+} else {
+    shouldAlsoBeKept;
+  }"
+`;
+
+exports[`plugin when transforming if statements extracts else-if-statements following matching if-clauses 1`] = `
+"if (module.notHot) {
+  shouldBeKept;
+} else {
+  shouldAlsoBeKept;
+}"
+`;
+
+exports[`plugin when transforming if statements extracts else-statements following matching if-clauses 1`] = `
+"{
+  shouldBeKept;
+}"
+`;
+
+exports[`plugin when transforming if statements ignores local variable bindings 1`] = `
+"const module = { hot: true };
+
+if (module.hot) {
+  shouldBeKept;
+}"
+`;
+
+exports[`plugin when transforming if statements ignores negated tests 1`] = `
+"if (!module.hot) {
+  shouldBeKept;
+}"
+`;
+
+exports[`plugin when transforming if statements ignores other object properties 1`] = `
+"if (module.notHot) {
+  shouldBeKept;
+}"
+`;
+
+exports[`plugin when transforming if statements ignores other objects 1`] = `
+"if (notModule.hot) {
+  shouldBeKept;
+}"
+`;
+
+exports[`plugin when transforming if statements removes standalone matching if-clauses 1`] = `
+"before;
+
+after;"
+`;
+
+exports[`plugin when using options allows customizing object and property names 1`] = `
+"if (module.hot) {
+  shouldBeKept;
+}"
+`;
