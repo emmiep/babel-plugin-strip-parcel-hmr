@@ -38,12 +38,12 @@ module.exports = function plugin() {
 
   function isIfTestExpression(expressionPath) {
     return expressionPath.parentPath.isIfStatement()
-      && expressionPath.parentPath.node.test === expressionPath.node;
+      && expressionPath.key === 'test';
   }
 
   function isConditionalTestExpression(expressionPath) {
     return expressionPath.parentPath.isConditionalExpression()
-      && expressionPath.parentPath.node.test === expressionPath.node;
+      && expressionPath.key === 'test';
   }
 
   function removeIfStatement(ifStatementPath) {
