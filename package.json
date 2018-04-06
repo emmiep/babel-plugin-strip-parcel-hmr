@@ -4,6 +4,7 @@
   "main": "src/plugin.js",
   "author": "Emmie Päivärinta <Emmie.Paivarinta@gmail.com>",
   "license": "MIT",
+  "repository": "github:emmiep/babel-plugin-strip-parcel-hmr",
   "keywords": [
     "babel-plugin",
     "parcel",
