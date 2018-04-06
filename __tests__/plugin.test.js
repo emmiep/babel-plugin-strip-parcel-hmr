@@ -9,52 +9,56 @@ const defaultBabelOptions = {
 const fixturesDir = path.join(__dirname, '__fixtures__');
 
 describe('plugin', () => {
-  it('removes standalone HMR test if-clauses', async () => {
-    const output = await transformFixture('remove-standalone-if');
-    expect(output.code).toMatchSnapshot();
-  });
-
-  it('extracts else-statements following HMR test if-clauses', async () => {
-    const output = await transformFixture('extract-following-else');
-    expect(output.code).toMatchSnapshot();
-  });
-
-  it('extracts else-if-statements following HMR test if-clauses', async () => {
-    const output = await transformFixture('extract-following-else-if');
-    expect(output.code).toMatchSnapshot();
-  });
-
-  it('combines if-clauses surrounding HMR test if-statements', async () => {
-    const output = await transformFixture('combine-surrounding-if');
-    expect(output.code).toMatchSnapshot();
-  });
-
-  it('ignores other properties of the HMR object', async () => {
-    const output = await transformFixture('ignore-other-object-properties');
-    expect(output.code).toMatchSnapshot();
-  });
-
-  it('ignores other objects', async () => {
-    const output = await transformFixture('ignore-other-objects');
-    expect(output.code).toMatchSnapshot();
-  });
-
-  it('ignores negated HMR tests', async () => {
-    const output = await transformFixture('ignore-negated-tests');
-    expect(output.code).toMatchSnapshot();
-  });
-
-  it('ignores local variable bindings', async () => {
-    const output = await transformFixture('ignore-local-variables');
-    expect(output.code).toMatchSnapshot();
-  });
-
-  it('allows customizing object and property names', async () => {
-    const output = await transformFixture('use-custom-names', {
-      objectName: 'customObjectName',
-      propertyName: 'customPropertyName'
+  describe('when transforming if statements', () => {
+    it('removes standalone matching if-clauses', async () => {
+      const output = await transformFixture('if/remove-standalone');
+      expect(output.code).toMatchSnapshot();
     });
-    expect(output.code).toMatchSnapshot();
+
+    it('extracts else-statements following matching if-clauses', async () => {
+      const output = await transformFixture('if/extract-following-else');
+      expect(output.code).toMatchSnapshot();
+    });
+
+    it('extracts else-if-statements following matching if-clauses', async () => {
+      const output = await transformFixture('if/extract-following-else-if');
+      expect(output.code).toMatchSnapshot();
+    });
+
+    it('combines if-clauses surrounding matching if-clauses', async () => {
+      const output = await transformFixture('if/combine-surrounding-if');
+      expect(output.code).toMatchSnapshot();
+    });
+
+    it('ignores other object properties', async () => {
+      const output = await transformFixture('if/ignore-other-object-properties');
+      expect(output.code).toMatchSnapshot();
+    });
+
+    it('ignores other objects', async () => {
+      const output = await transformFixture('if/ignore-other-objects');
+      expect(output.code).toMatchSnapshot();
+    });
+
+    it('ignores negated tests', async () => {
+      const output = await transformFixture('if/ignore-negated-tests');
+      expect(output.code).toMatchSnapshot();
+    });
+
+    it('ignores local variable bindings', async () => {
+      const output = await transformFixture('if/ignore-local-variables');
+      expect(output.code).toMatchSnapshot();
+    });
+  });
+
+  describe('when using options', () => {
+    it('allows customizing object and property names', async () => {
+      const output = await transformFixture('using-options/customize-names', {
+        objectName: 'customObjectName',
+        propertyName: 'customPropertyName'
+      });
+      expect(output.code).toMatchSnapshot();
+    });
   });
 });
 
