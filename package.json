@@ -4,6 +4,11 @@
   "main": "src/plugin.js",
   "author": "Emmie Päivärinta <Emmie.Paivarinta@gmail.com>",
   "license": "MIT",
+  "keywords": [
+    "babel-plugin",
+    "parcel",
+    "hmr"
+  ],
   "scripts": {
     "test": "jest",
     "lint": "eslint src/** __tests__/**",
