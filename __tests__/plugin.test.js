@@ -51,6 +51,33 @@ describe('plugin', () => {
     });
   });
 
+  describe('when transforming conditional expressions', () => {
+    it('substitutes expressions with matching tests', async () => {
+      const output = await transformFixture('conditional/substitute-expression');
+      expect(output.code).toMatchSnapshot();
+    });
+
+    it('ignores other object properties', async () => {
+      const output = await transformFixture('conditional/ignore-other-object-properties');
+      expect(output.code).toMatchSnapshot();
+    });
+
+    it('ignores other objects', async () => {
+      const output = await transformFixture('conditional/ignore-other-objects');
+      expect(output.code).toMatchSnapshot();
+    });
+
+    it('ignores negated tests', async () => {
+      const output = await transformFixture('conditional/ignore-negated-tests');
+      expect(output.code).toMatchSnapshot();
+    });
+
+    it('ignores local variable bindings', async () => {
+      const output = await transformFixture('conditional/ignore-local-variables');
+      expect(output.code).toMatchSnapshot();
+    });
+  });
+
   describe('when using options', () => {
     it('allows customizing object and property names', async () => {
       const output = await transformFixture('using-options/customize-names', {

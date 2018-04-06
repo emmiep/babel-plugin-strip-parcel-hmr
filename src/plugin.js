@@ -13,9 +13,12 @@ module.exports = function plugin() {
 
         if (!isMember(path, {objectName, propertyName})) return;
         if (!isGlobalVariable(path.get('object'))) return;
-        if (!isIfTestExpression(path)) return;
 
-        removeIfStatement(path.parentPath);
+        if (isIfTestExpression(path)) {
+          removeIfStatement(path.parentPath);
+        } else if (isConditionalTestExpression(path)) {
+          removeConditionalExpression(path.parentPath, false);
+        }
       }
     }
   };
@@ -38,6 +41,11 @@ module.exports = function plugin() {
       && expressionPath.parentPath.node.test === expressionPath.node;
   }
 
+  function isConditionalTestExpression(expressionPath) {
+    return expressionPath.parentPath.isConditionalExpression()
+      && expressionPath.parentPath.node.test === expressionPath.node;
+  }
+
   function removeIfStatement(ifStatementPath) {
     const elseStatement = ifStatementPath.node.alternate;
 
@@ -46,6 +54,11 @@ module.exports = function plugin() {
     } else {
       ifStatementPath.remove();
     }
+  }
+
+  function removeConditionalExpression(conditionalStatementPath, testValue) {
+    const valueExpression = conditionalStatementPath.get(testValue ? 'consequent' : 'alternate').node;
+    conditionalStatementPath.replaceWith(valueExpression);
   }
 };
 
