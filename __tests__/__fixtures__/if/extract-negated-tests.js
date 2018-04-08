@@ -1,4 +1,4 @@
 if (!module.hot) {
-  shouldBeKept;
+  shouldBeExtracted;
 }
 
