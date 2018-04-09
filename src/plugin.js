@@ -42,12 +42,19 @@ module.exports = function plugin() {
 };
 
 function getTestExpressionPath(memberExpressionPath) {
-  return memberExpressionPath.find((path) => {
-    const parentPath = path.parentPath;
-    return parentPath
-      && (parentPath.isIfStatement() || parentPath.isConditionalExpression())
-      && path.key === 'test';
+  const testExpressionPath = memberExpressionPath.find((path) => {
+    if (!path.isExpression()) return true;
+
+    return isTestExpression(path);
   });
+
+  return isTestExpression(testExpressionPath) ? testExpressionPath : null;
+}
+
+function isTestExpression(expressionPath) {
+  return (expressionPath && expressionPath.parentPath)
+    && (expressionPath.parentPath.isIfStatement() || expressionPath.parentPath.isConditionalExpression())
+    && expressionPath.key === 'test';
 }
 
 function isGlobalVariable(identifierPath) {
