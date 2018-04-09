@@ -18,10 +18,10 @@ module.exports = function plugin() {
 
         if (testExpressionPath) {
           const evaluator = new TestExpressionEvaluator({objectName, propertyName});
-          const {type, value} = evaluator.evaluate(testExpressionPath);
+          const test = evaluator.evaluate(testExpressionPath);
 
-          if (type) {
-            updatePath(testExpressionPath.parentPath, value);
+          if (test.hasValue) {
+            updatePath(testExpressionPath.parentPath, test.value);
           }
         }
       }
@@ -64,6 +64,8 @@ function isMember(expressionPath, {objectName, propertyName}) {
 }
 
 function removeIfClause(ifStatementPath) {
+  ifStatementPath.assertIfStatement();
+
   const elseStatement = ifStatementPath.node.alternate;
 
   if (elseStatement) {
@@ -74,12 +76,15 @@ function removeIfClause(ifStatementPath) {
 }
 
 function extractIfClause(ifStatementPath) {
+  ifStatementPath.assertIfStatement();
   ifStatementPath.replaceWith(ifStatementPath.get('consequent'));
 }
 
-function removeConditionalExpression(conditionalStatementPath, testValue) {
-  const valueExpression = conditionalStatementPath.get(testValue ? 'consequent' : 'alternate').node;
-  conditionalStatementPath.replaceWith(valueExpression);
+function removeConditionalExpression(conditionalExpressionPath, testValue) {
+  conditionalExpressionPath.assertConditionalExpression();
+
+  const valueExpression = conditionalExpressionPath.get(testValue ? 'consequent' : 'alternate').node;
+  conditionalExpressionPath.replaceWith(valueExpression);
 }
 
 function TestExpressionEvaluator(options) {
@@ -89,32 +94,153 @@ function TestExpressionEvaluator(options) {
 TestExpressionEvaluator.prototype.evaluate = function evaluate(path) {
   if (path.isMemberExpression()) {
     return this._evaluateMemberExpression(path);
+  } else if (path.isBinaryExpression()) {
+    return this._evaluateBinaryExpression(path);
   } else if (path.isUnaryExpression()) {
     return this._evaluateUnaryExpression(path);
+  } else if (path.isLiteral()) {
+    return this._evaluateLiteral(path);
   }
 
-  return {};
+  return MaybeValue.nothing();
 };
 
 TestExpressionEvaluator.prototype._evaluateMemberExpression = function _evaluateMemberExpression(path) {
+  path.assertMemberExpression();
+
   const {objectName, propertyName} = this;
 
   if (isMember(path, {objectName, propertyName}) && isGlobalVariable(path.get('object'))) {
-    return {type: 'undefined', value: undefined};
+    return MaybeValue.from(undefined);
   }
 
-  return {};
+  return MaybeValue.nothing();
+};
+
+TestExpressionEvaluator.prototype._evaluateBinaryExpression = function _evaluateBinaryExpression(path) {
+  path.assertBinaryExpression();
+
+  const left = this.evaluate(path.get('left'));
+  const right = this.evaluate(path.get('right'));
+
+  switch (path.node.operator) {
+    case '==':
+      return left.equals(right);
+    case '!=':
+      return left.notEquals(right);
+    case '===':
+      return left.strictEquals(right);
+    case '!==':
+      return left.strictNotEquals(right);
+    default:
+      return MaybeValue.nothing();
+  }
 };
 
 TestExpressionEvaluator.prototype._evaluateUnaryExpression = function _evaluateUnaryExpression(path) {
-  if (path.isUnaryExpression({operator: '!'})) {
-    const {type, value} = this.evaluate(path.get('argument'));
+  path.assertUnaryExpression();
 
-    if (type) {
-      return {type: typeof(value), value: !value};
+  const argument = this.evaluate(path.get('argument'));
+
+  switch (path.node.operator) {
+    case '!':
+      return argument.not();
+    case 'typeof':
+      return argument.typeof();
+    default:
+      return MaybeValue.nothing();
+  }
+};
+
+TestExpressionEvaluator.prototype._evaluateLiteral = function _evaluateLiteral(path) {
+  path.assertLiteral();
+
+  return MaybeValue.from(path.node.value);
+};
+
+function MaybeValue({type, value} = {}) {
+  Object.assign(this, {type, value});
+}
+
+MaybeValue.from = function fromValue(value) {
+  return new MaybeValue({type: typeof value, value});
+};
+
+MaybeValue.any = function any() {
+  return new MaybeValue({type: 'any'});
+};
+
+MaybeValue.nothing = function nothing() {
+  return new MaybeValue();
+};
+
+Object.defineProperties(MaybeValue.prototype, {
+  hasType: {
+    get() {
+      return typeof this.type != 'undefined' && this.type !== 'any';
+    }
+  },
+
+  hasValue: {
+    get() {
+      return (this.type === 'undefined' && this.value === undefined)
+        || (this.type === 'object' && this.value === null)
+        || (typeof this.type != 'undefined' && typeof this.value != 'undefined');
+    }
+  },
+
+  isAny: {
+    get() {
+      return this.type === 'any';
+    }
+  },
+
+  isNothing: {
+    get() {
+      return typeof this.type == 'undefined';
     }
   }
+});
 
-  return {};
+MaybeValue._binaryOperation = function _binaryOperation(fn) {
+  return function (rhs) {
+    if (this.isAny || rhs.isAny) {
+      return MaybeValue.any();
+    } else if (this.isNothing || rhs.isNothing) {
+      return MaybeValue.nothing();
+    } else {
+      const value = fn(this.value, rhs.value);
+      const type = typeof value;
+      return new MaybeValue({type, value});
+    }
+  };
 };
+
+MaybeValue._unaryOperation = function _unaryOperation(fn) {
+  return function () {
+    if (this.isAny) {
+      return MaybeValue.any();
+    } else if (this.isNothing) {
+      return MaybeValue.nothing();
+    } else {
+      const value = fn(this.value);
+      const type = typeof value;
+      return new MaybeValue({type, value});
+    }
+  };
+};
+
+MaybeValue.prototype.not = MaybeValue._unaryOperation((value) => !value);
+
+MaybeValue.prototype.typeof = MaybeValue._unaryOperation((value) => typeof value);
+
+// eslint-disable-next-line eqeqeq
+MaybeValue.prototype.equals = MaybeValue._binaryOperation((lhs, rhs) => lhs == rhs);
+
+// eslint-disable-next-line eqeqeq
+MaybeValue.prototype.notEquals = MaybeValue._binaryOperation((lhs, rhs) => lhs != rhs);
+
+MaybeValue.prototype.strictEquals = MaybeValue._binaryOperation((lhs, rhs) => lhs === rhs);
+
+MaybeValue.prototype.strictNotEquals = MaybeValue._binaryOperation((lhs, rhs) => lhs !== rhs);
 

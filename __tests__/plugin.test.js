@@ -15,6 +15,11 @@ describe('plugin', () => {
       expect(output.code).toMatchSnapshot();
     });
 
+    it('removes standalone matching typeof if-clauses', async () => {
+      const output = await transformFixture('if/remove-standalone-typeof');
+      expect(output.code).toMatchSnapshot();
+    });
+
     it('extracts else-statements following matching if-clauses', async () => {
       const output = await transformFixture('if/extract-following-else');
       expect(output.code).toMatchSnapshot();
@@ -54,6 +59,11 @@ describe('plugin', () => {
   describe('when transforming conditional expressions', () => {
     it('substitutes expressions with matching tests', async () => {
       const output = await transformFixture('conditional/substitute-expression');
+      expect(output.code).toMatchSnapshot();
+    });
+
+    it('substitutes expressions with matching typeof tests', async () => {
+      const output = await transformFixture('conditional/substitute-typeof-expression');
       expect(output.code).toMatchSnapshot();
     });
 
