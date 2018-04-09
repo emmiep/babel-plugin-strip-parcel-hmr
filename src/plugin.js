@@ -8,25 +8,38 @@ const defaultOptions = {
 module.exports = function plugin() {
   return {
     visitor: {
-      MemberExpression(path, {opts}) {
-        const {objectName, propertyName} = Object.assign({}, defaultOptions, opts);
+      MemberExpression(path, state) {
+        const {objectName, propertyName} = getOptions(state);
 
-        if (!isMember(path, {objectName, propertyName})) return;
+        if (!isMemberExpression(path, {objectName, propertyName})) return;
         if (!isGlobalVariable(path.get('object'))) return;
 
-        const testExpressionPath = getTestExpressionPath(path);
+        tryReplacePath(path, {objectName, propertyName});
+      },
 
-        if (testExpressionPath) {
-          const evaluator = new TestExpressionEvaluator({objectName, propertyName});
-          const test = evaluator.evaluate(testExpressionPath);
+      BinaryExpression(path, state) {
+        const {objectName, propertyName} = getOptions(state);
 
-          if (test.hasValue) {
-            updatePath(testExpressionPath.parentPath, test.value);
-          }
-        }
+        if (!isInExpression(path, {objectName, propertyName})) return;
+        if (!isGlobalVariable(path.get('right'))) return;
+
+        tryReplacePath(path, {objectName, propertyName});
       }
     }
   };
+
+  function tryReplacePath(path, {objectName, propertyName}) {
+    const testExpressionPath = getTestExpressionPath(path);
+
+    if (testExpressionPath) {
+      const evaluator = new TestExpressionEvaluator({objectName, propertyName});
+      const test = evaluator.evaluate(testExpressionPath);
+
+      if (test.hasValue) {
+        updatePath(testExpressionPath.parentPath, test.value);
+      }
+    }
+  }
 
   function updatePath(path, testValue) {
     if (path.isIfStatement()) {
@@ -38,6 +51,10 @@ module.exports = function plugin() {
     } else if (path.isConditionalExpression()) {
       removeConditionalExpression(path, testValue);
     }
+  }
+
+  function getOptions({opts}) {
+    return Object.assign({}, defaultOptions, opts);
   }
 };
 
@@ -64,10 +81,16 @@ function isGlobalVariable(identifierPath) {
     && identifierPath.scope.hasGlobal(name);
 }
 
-function isMember(expressionPath, {objectName, propertyName}) {
-  return expressionPath.isMemberExpression({computed: false})
+function isMemberExpression(expressionPath, {objectName, propertyName}) {
+  return (expressionPath && expressionPath.isMemberExpression({computed: false}))
     && expressionPath.get('object').isIdentifier({name: objectName})
     && expressionPath.get('property').isIdentifier({name: propertyName});
+}
+
+function isInExpression(expressionPath, {objectName, propertyName}) {
+  return (expressionPath && expressionPath.isBinaryExpression({operator: 'in'}))
+    && expressionPath.get('left').isStringLiteral({value: propertyName})
+    && expressionPath.get('right').isIdentifier({name: objectName});
 }
 
 function removeIfClause(ifStatementPath) {
@@ -101,6 +124,8 @@ function TestExpressionEvaluator(options) {
 TestExpressionEvaluator.prototype.evaluate = function evaluate(path) {
   if (path.isMemberExpression()) {
     return this._evaluateMemberExpression(path);
+  } else if (path.isBinaryExpression({operator: 'in'})) {
+    return this._evaluateInExpression(path);
   } else if (path.isBinaryExpression()) {
     return this._evaluateBinaryExpression(path);
   } else if (path.isUnaryExpression()) {
@@ -117,8 +142,20 @@ TestExpressionEvaluator.prototype._evaluateMemberExpression = function _evaluate
 
   const {objectName, propertyName} = this;
 
-  if (isMember(path, {objectName, propertyName}) && isGlobalVariable(path.get('object'))) {
+  if (isMemberExpression(path, {objectName, propertyName}) && isGlobalVariable(path.get('object'))) {
     return MaybeValue.from(undefined);
+  }
+
+  return MaybeValue.nothing();
+};
+
+TestExpressionEvaluator.prototype._evaluateInExpression = function _evaluateInExpression(path) {
+  path.assertBinaryExpression({operator: 'in'});
+
+  const {objectName, propertyName} = this;
+
+  if (isInExpression(path, {objectName, propertyName}) && isGlobalVariable(path.get('right'))) {
+    return MaybeValue.from(false);
   }
 
   return MaybeValue.nothing();
@@ -250,4 +287,6 @@ MaybeValue.prototype.notEquals = MaybeValue._binaryOperation((lhs, rhs) => lhs !
 MaybeValue.prototype.strictEquals = MaybeValue._binaryOperation((lhs, rhs) => lhs === rhs);
 
 MaybeValue.prototype.strictNotEquals = MaybeValue._binaryOperation((lhs, rhs) => lhs !== rhs);
+
+MaybeValue.prototype.in = MaybeValue._binaryOperation((lhs, rhs) => lhs in rhs);
 

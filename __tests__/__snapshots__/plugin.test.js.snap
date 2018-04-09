@@ -14,7 +14,9 @@ exports[`plugin when transforming conditional expressions substitutes expression
 
 exports[`plugin when transforming conditional expressions substitutes expressions with matching tests 1`] = `"const value = shouldBeKept;"`;
 
-exports[`plugin when transforming conditional expressions substitutes expressions with matching typeof tests 1`] = `"const value = shouldBeKept;"`;
+exports[`plugin when transforming conditional expressions substitutes expressions with matching tests using in operators 1`] = `"const value = shouldBeKept;"`;
+
+exports[`plugin when transforming conditional expressions substitutes expressions with matching tests using typeof operators 1`] = `"const value = shouldBeKept;"`;
 
 exports[`plugin when transforming if statements combines if-clauses surrounding matching if-clauses 1`] = `
 "if (module.notHot) {
@@ -70,7 +72,13 @@ exports[`plugin when transforming if statements removes standalone matching if-c
 after;"
 `;
 
-exports[`plugin when transforming if statements removes standalone matching typeof if-clauses 1`] = `
+exports[`plugin when transforming if statements removes standalone matching if-clauses using in operators 1`] = `
+"before;
+
+after;"
+`;
+
+exports[`plugin when transforming if statements removes standalone matching if-clauses using typeof operators 1`] = `
 "before;
 
 after;"

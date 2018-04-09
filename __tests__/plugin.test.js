@@ -15,8 +15,13 @@ describe('plugin', () => {
       expect(output.code).toMatchSnapshot();
     });
 
-    it('removes standalone matching typeof if-clauses', async () => {
+    it('removes standalone matching if-clauses using typeof operators', async () => {
       const output = await transformFixture('if/remove-standalone-typeof');
+      expect(output.code).toMatchSnapshot();
+    });
+
+    it('removes standalone matching if-clauses using in operators', async () => {
+      const output = await transformFixture('if/remove-standalone-in');
       expect(output.code).toMatchSnapshot();
     });
 
@@ -62,8 +67,13 @@ describe('plugin', () => {
       expect(output.code).toMatchSnapshot();
     });
 
-    it('substitutes expressions with matching typeof tests', async () => {
+    it('substitutes expressions with matching tests using typeof operators', async () => {
       const output = await transformFixture('conditional/substitute-typeof-expression');
+      expect(output.code).toMatchSnapshot();
+    });
+
+    it('substitutes expressions with matching tests using in operators', async () => {
+      const output = await transformFixture('conditional/substitute-in-expression');
       expect(output.code).toMatchSnapshot();
     });
 
