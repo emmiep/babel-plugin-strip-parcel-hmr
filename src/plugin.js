@@ -82,9 +82,21 @@ function isGlobalVariable(identifierPath) {
 }
 
 function isMemberExpression(expressionPath, {objectName, propertyName}) {
-  return (expressionPath && expressionPath.isMemberExpression({computed: false}))
+  return (expressionPath && expressionPath.isMemberExpression())
     && expressionPath.get('object').isIdentifier({name: objectName})
-    && expressionPath.get('property').isIdentifier({name: propertyName});
+    && matchMemberExpressionProperty(expressionPath, propertyName);
+}
+
+function matchMemberExpressionProperty(memberExpressionPath, propertyName) {
+  memberExpressionPath.assertMemberExpression();
+
+  const propertyPath = memberExpressionPath.get('property');
+
+  if (memberExpressionPath.node.computed) {
+    return propertyPath.isStringLiteral({value: propertyName});
+  } else {
+    return propertyPath.isIdentifier({name: propertyName});
+  }
 }
 
 function isInExpression(expressionPath, {objectName, propertyName}) {

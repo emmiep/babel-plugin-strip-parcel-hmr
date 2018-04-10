@@ -15,6 +15,11 @@ describe('plugin', () => {
       expect(output.code).toMatchSnapshot();
     });
 
+    it('removes standalone matching if-clauses using computed string properties', async() => {
+      const output = await transformFixture('if/remove-standalone-computed');
+      expect(output.code).toMatchSnapshot();
+    });
+
     it('removes standalone matching if-clauses using typeof operators', async () => {
       const output = await transformFixture('if/remove-standalone-typeof');
       expect(output.code).toMatchSnapshot();
@@ -64,6 +69,11 @@ describe('plugin', () => {
   describe('when transforming conditional expressions', () => {
     it('substitutes expressions with matching tests', async () => {
       const output = await transformFixture('conditional/substitute-expression');
+      expect(output.code).toMatchSnapshot();
+    });
+
+    it('substitutes expressions with matching tests using computed string properties', async () => {
+      const output = await transformFixture('conditional/substitute-expression-computed');
       expect(output.code).toMatchSnapshot();
     });
 
