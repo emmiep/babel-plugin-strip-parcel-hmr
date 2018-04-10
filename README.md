@@ -2,6 +2,15 @@
 
 An experimental Babel plugin for removing [hot module replacement] (HMR) code from production bundles created with [Parcel].
 
+Currently the following syntaxes are supported:
+
+* Tests in `if` and `else` statements
+* Tests in the ternary `?:` operator
+* Checking for HMR with `module.hot` and `module['hot']`
+* Checking for HMR with `typeof module.hot`
+* Checking for HMR with `'hot' in module`
+* Negating tests with `!`
+
 ## Examples
 
 **In**
