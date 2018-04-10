@@ -35,6 +35,22 @@ const value = 'in production';
 // rest of the code here
 ```
 
+**In**
+
+```js
+if (!module.hot) {
+  // only when HMR is disabled
+}
+```
+
+**Out**
+
+```js
+{
+  // only when HMR is disabled
+}
+```
+
 ## Installation
 
 ```sh
