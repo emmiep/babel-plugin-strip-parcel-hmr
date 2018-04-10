@@ -15,6 +15,21 @@ describe('plugin', () => {
       expect(output.code).toMatchSnapshot();
     });
 
+    it('removes standalone matching if-clauses using computed string properties', async () => {
+      const output = await transformFixture('if/remove-standalone-computed');
+      expect(output.code).toMatchSnapshot();
+    });
+
+    it('removes standalone matching if-clauses using typeof operators', async () => {
+      const output = await transformFixture('if/remove-standalone-typeof');
+      expect(output.code).toMatchSnapshot();
+    });
+
+    it('removes standalone matching if-clauses using in operators', async () => {
+      const output = await transformFixture('if/remove-standalone-in');
+      expect(output.code).toMatchSnapshot();
+    });
+
     it('extracts else-statements following matching if-clauses', async () => {
       const output = await transformFixture('if/extract-following-else');
       expect(output.code).toMatchSnapshot();
@@ -22,6 +37,11 @@ describe('plugin', () => {
 
     it('extracts else-if-statements following matching if-clauses', async () => {
       const output = await transformFixture('if/extract-following-else-if');
+      expect(output.code).toMatchSnapshot();
+    });
+
+    it('extracts standalone matching negated if-clauses', async () => {
+      const output = await transformFixture('if/extract-negated-tests');
       expect(output.code).toMatchSnapshot();
     });
 
@@ -40,11 +60,6 @@ describe('plugin', () => {
       expect(output.code).toMatchSnapshot();
     });
 
-    it('ignores negated tests', async () => {
-      const output = await transformFixture('if/ignore-negated-tests');
-      expect(output.code).toMatchSnapshot();
-    });
-
     it('ignores local variable bindings', async () => {
       const output = await transformFixture('if/ignore-local-variables');
       expect(output.code).toMatchSnapshot();
@@ -57,6 +72,26 @@ describe('plugin', () => {
       expect(output.code).toMatchSnapshot();
     });
 
+    it('substitutes expressions with matching tests using computed string properties', async () => {
+      const output = await transformFixture('conditional/substitute-expression-computed');
+      expect(output.code).toMatchSnapshot();
+    });
+
+    it('substitutes expressions with matching tests using typeof operators', async () => {
+      const output = await transformFixture('conditional/substitute-typeof-expression');
+      expect(output.code).toMatchSnapshot();
+    });
+
+    it('substitutes expressions with matching tests using in operators', async () => {
+      const output = await transformFixture('conditional/substitute-in-expression');
+      expect(output.code).toMatchSnapshot();
+    });
+
+    it('substitutes expressions with matching negated tests', async () => {
+      const output = await transformFixture('conditional/negated-substitute-expression');
+      expect(output.code).toMatchSnapshot();
+    });
+
     it('ignores other object properties', async () => {
       const output = await transformFixture('conditional/ignore-other-object-properties');
       expect(output.code).toMatchSnapshot();
@@ -64,11 +99,6 @@ describe('plugin', () => {
 
     it('ignores other objects', async () => {
       const output = await transformFixture('conditional/ignore-other-objects');
-      expect(output.code).toMatchSnapshot();
-    });
-
-    it('ignores negated tests', async () => {
-      const output = await transformFixture('conditional/ignore-negated-tests');
       expect(output.code).toMatchSnapshot();
     });
 

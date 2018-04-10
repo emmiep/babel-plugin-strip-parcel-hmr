@@ -6,13 +6,19 @@ exports[`plugin when transforming conditional expressions ignores local variable
 const value = module.hot ? shouldBeKept : shouldAlsoBeKept;"
 `;
 
-exports[`plugin when transforming conditional expressions ignores negated tests 1`] = `"const value = !module.hot ? shouldBeKept : shouldAlsoBeKept;"`;
-
 exports[`plugin when transforming conditional expressions ignores other object properties 1`] = `"const value = module.notHot ? shouldBeKept : shouldAlsoBeKept;"`;
 
 exports[`plugin when transforming conditional expressions ignores other objects 1`] = `"const value = notModule.hot ? shouldBeKept : shouldAlsoBeKept;"`;
 
+exports[`plugin when transforming conditional expressions substitutes expressions with matching negated tests 1`] = `"const value = shouldBeKept;"`;
+
 exports[`plugin when transforming conditional expressions substitutes expressions with matching tests 1`] = `"const value = shouldBeKept;"`;
+
+exports[`plugin when transforming conditional expressions substitutes expressions with matching tests using computed string properties 1`] = `"const value = shouldBeKept;"`;
+
+exports[`plugin when transforming conditional expressions substitutes expressions with matching tests using in operators 1`] = `"const value = shouldBeKept;"`;
+
+exports[`plugin when transforming conditional expressions substitutes expressions with matching tests using typeof operators 1`] = `"const value = shouldBeKept;"`;
 
 exports[`plugin when transforming if statements combines if-clauses surrounding matching if-clauses 1`] = `
 "if (module.notHot) {
@@ -36,16 +42,16 @@ exports[`plugin when transforming if statements extracts else-statements followi
 }"
 `;
 
+exports[`plugin when transforming if statements extracts standalone matching negated if-clauses 1`] = `
+"{
+  shouldBeExtracted;
+}"
+`;
+
 exports[`plugin when transforming if statements ignores local variable bindings 1`] = `
 "const module = { hot: true };
 
 if (module.hot) {
-  shouldBeKept;
-}"
-`;
-
-exports[`plugin when transforming if statements ignores negated tests 1`] = `
-"if (!module.hot) {
   shouldBeKept;
 }"
 `;
@@ -63,6 +69,24 @@ exports[`plugin when transforming if statements ignores other objects 1`] = `
 `;
 
 exports[`plugin when transforming if statements removes standalone matching if-clauses 1`] = `
+"before;
+
+after;"
+`;
+
+exports[`plugin when transforming if statements removes standalone matching if-clauses using computed string properties 1`] = `
+"before;
+
+after;"
+`;
+
+exports[`plugin when transforming if statements removes standalone matching if-clauses using in operators 1`] = `
+"before;
+
+after;"
+`;
+
+exports[`plugin when transforming if statements removes standalone matching if-clauses using typeof operators 1`] = `
 "before;
 
 after;"
