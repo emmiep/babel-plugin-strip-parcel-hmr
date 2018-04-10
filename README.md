@@ -90,8 +90,14 @@ The name of the global object containing a property (`propertyName`) used when c
 
 The name of the property used when checking if HMR is enabled.
 
+## Caveats
+
+Currently Parcel is [not implementing tree-shaking][parcel-tree-shaking], which means functions only used during development for HMR will still be included in the production bundles unless they're defined inside if statements testing for HMR.
+For instance any module imported using the ES6 `import` keyword will always be included in the production bundle.
+
 [hot module replacement]: https://parceljs.org/hmr.html
 [Parcel]: https://parceljs.org/
 [parcel-production]: https://parceljs.org/production.html
 [babel-env-option]: https://babeljs.io/docs/usage/babelrc/#env-option
+[parcel-tree-shaking]: https://github.com/parcel-bundler/parcel/issues/392
 
