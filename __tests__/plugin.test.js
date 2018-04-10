@@ -15,7 +15,7 @@ describe('plugin', () => {
       expect(output.code).toMatchSnapshot();
     });
 
-    it('removes standalone matching if-clauses using computed string properties', async() => {
+    it('removes standalone matching if-clauses using computed string properties', async () => {
       const output = await transformFixture('if/remove-standalone-computed');
       expect(output.code).toMatchSnapshot();
     });
